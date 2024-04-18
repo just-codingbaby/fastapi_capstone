@@ -1,91 +1,61 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-
-from model.inference import SegRnn, use_cuda
-import pandas as pd
-import torch
 import mysql.connector
-import os
+from app.db_location import connect_to_mysql
 
-router = APIRouter()
+loc_node = [
+                    [127.1008565722434, 37.396502014449894],
+                    [127.10332041039379, 37.358794072637785],
+                    [127.1034515341123, 37.33356568720989],
+                    [127.10371825319847, 37.282207568764164],
+                    [127.10378839595677, 37.268692199713435],
+                    [127.10381177258138, 37.26418706952283],
+                    [127.10000025955983, 37.220871613416406],
+                    [127.09583359115491, 37.21257018267256],
+                    [127.09606378065385, 37.18069128191127],
+                    [127.09095628389771, 37.16515618993971],
+                    [127.0849166721204, 37.141197247014425],
+                    [127.1192174917301, 37.09957860692084],
+                [127.1303810262686, 37.076033172993704],
+[127.1453124272744, 37.01470955711591],
+[127.15417441331587, 36.99434172233534],
+[127.15925352834235, 36.98342187402131],
+[127.18826863839793, 36.877147179016006],
+[127.16620375354104, 36.8193716654845],
+[127.1666213807959, 36.79974216728726],
+[127.19023650476807, 36.76697529740176],
+[127.2309875538001, 36.745043810570984],
+[127.38303029780384, 36.627080729093386],
+[127.4305295251844, 36.56516799699589],
+[127.43210220588804, 36.55363043485985],
+[127.43020967328724, 36.532986405455695],
+[127.42923867327536, 36.51398873766687],
+[127.42794983703914, 36.471908653925546],
+[127.4197184682824, 36.43852029408191],
+[127.41731976383807, 36.429692944186755],
+[127.41870756182243, 36.39700720499854]
+]
 
-# directory = "/Users/jeonghaechan/Desktop/capstone/0010경부선"
-# files = sorted([file for file in os.listdir(directory) if not file.startswith('.DS_Store')])
+connection = connect_to_mysql()
+mycursor = connection.cursor()
 
-# connection = mysql.connector.connect(
-#     host='localhost',
-#     user='root',
-#     password='Wjdgocks2!',
-#     database='경부선'
-# )
-#
-# def create_dataframe_from_table(table_name):
-#     cursor = connection.cursor()
-#     cursor.execute(f"SELECT * FROM {table_name}")
-#     rows = cursor.fetchall()
-#     df = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
-#     cursor.close()
-#     return df
+def insert_into_thirty(node_name, latitude, longitude):
+    sql = "INSERT INTO thirty (노드명, 위도, 경도) VALUES (%s, %s, %s)"
+    val = (node_name, latitude, longitude)
+    mycursor.execute(sql, val)
+    connection.commit()
 
-path = '/Users/jeonghaechan/projects/capstone-fastapi/data/' #여기 수정해야 함
-df = pd.read_csv(path + '0251VDS18000.csv') #csv 파일은 노드마다 바뀌기에 이 부분도 수정해야 함
-df['datetime'] = pd.to_datetime(df['datetime'])
-df['year'] = df['datetime'].apply(lambda row:row.year, 1)
-df['month'] = df['datetime'].apply(lambda row:row.month, 1)
-df['date'] = df['datetime'].apply(lambda row:row.day, 1)
-df['hour'] = df['datetime'].apply(lambda row:row.hour, 1)
-df['minute'] = df['datetime'].apply(lambda row:row.minute, 1)
-df['weekday'] = df['datetime'].apply(lambda row:row.weekday(), 1)
 
-df.set_index('datetime', drop = True, inplace = True)
-df = df[['TRFFCVLM', 'OCCPNCY', 'year', 'month', 'date', 'hour', 'minute', 'weekday', 'SPD_AVG']]
 
-enc_in = len(df.columns)
-# seq_len = 92
-pred_len = 1
-patch_len = 1
-dropout = 0.1
-hidden_dim = 128
+for node in loc_node:
+    latitude = node[1]
+    longitude = node[0]
 
-device = torch.device('cuda' if use_cuda else 'cpu')
+    sql = "SELECT 노드명, 위도, 경도 FROM location WHERE 위도 = %s AND 경도 = %s"
+    val = (latitude, longitude)
+    mycursor.execute(sql, val)
+    result = mycursor.fetchone()
 
-class PredictionInput(BaseModel):
-    data: str
+    node_name, latitude, longitude = result
+    insert_into_thirty(node_name, latitude, longitude)
 
-@router.post("/predict")
-async def predict(input_data: PredictionInput):
-    try:
-        input_string = input_data.data
-        input_string = pd.to_datetime(input_string)
-
-        # 입력 들어왔는지 확인
-        print(input_string)
-
-        filtered_df = df[(df['hour'] == input_string.hour) & (df['minute'] == input_string.minute)]
-
-        model_test = pd.DataFrame(filtered_df).to_numpy()
-        model_test_scaled = torch.FloatTensor(model_test).unsqueeze(0).to(device)
-
-        # 입력 데이터 길이에 따라 seq_len 설정
-        seq_len = len(filtered_df)
-
-        # 모델 생성 및 가중치 로드
-        example = SegRnn(enc_in, seq_len, pred_len, patch_len, dropout, hidden_dim).to(device)
-        example.load_state_dict(torch.load('/Users/jeonghaechan/projects/capstone-fastapi/model/example.pkl',
-                                           map_location=torch.device('cpu')))
-
-        # 추론 모드 설정
-        example.eval()
-
-        # 모델 추론 수행
-        with torch.no_grad():
-            prediction = example(model_test_scaled)
-            # print("prediction"+ str(prediction))
-
-        pred = prediction[:, -1, :].cpu().numpy()
-        result = float(pred[0][-1])
-
-        return {"result": result}
-    except Exception as e:
-        # 예외 발생 시 HTTP 예외 반환
-        raise HTTPException(status_code=500, detail=str(e))
+mycursor.close()
+connection.close()
