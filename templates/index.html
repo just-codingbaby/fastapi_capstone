@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Prediction</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Prediction Result</h2>
+
+    <!-- 입력 폼 -->
+    <form id="predict-form">
+        <label for="data">Enter Data(YYYY-MM-DD HH:MM:SS):</label><br>
+        <textarea id="data" name="data" rows="4" cols="50"></textarea><br>
+        <button type="submit">Predict</button>
+    </form>
+
+    <!-- 결과 테이블 -->
+    <table id="result-table">
+        <thead>
+            <tr>
+                <th>Index</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Result rows will be added here dynamically -->
+        </tbody>
+    </table>
+
+    <script>
+        async function postData(url = '/predict', data = {}) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        }
+
+        document.getElementById("predict-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {
+                data: formData.get("data")
+            };
+            const responseData = await postData('/predict', data);
+            const resultTable = document.getElementById("result-table").getElementsByTagName('tbody')[0];
+            resultTable.innerHTML = ''; // Clear previous results
+            responseData.result.forEach((result, index) => {
+                const row = `<tr><td>${index + 1}</td><td>${result}</td></tr>`;
+                resultTable.insertAdjacentHTML('beforeend', row);
+            });
+        });
+    </script>
+</body>
+</html>
