@@ -21,26 +21,17 @@
 
     <!-- 입력 폼 -->
     <form id="predict-form">
-        <label for="data">Enter Data(YYYY-MM-DD HH:MM:SS):</label><br>
+        <label for="data">Enter Data (YYYY-MM-DD HH:MM:SS):</label><br>
         <textarea id="data" name="data" rows="4" cols="50"></textarea><br>
         <button type="submit">Predict</button>
     </form>
 
-    <!-- 결과 테이블 -->
-    <table id="result-table">
-        <thead>
-            <tr>
-                <th>Index</th>
-                <th>Result</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Result rows will be added here dynamically -->
-        </tbody>
-    </table>
+    <!-- 결과 표시 -->
+    <h3>총 시간 (Router 1): <span id="result-router1"></span></h3> <!-- Router 1 결과 표시 -->
+    <h3>총 시간 (Router 2): <span id="result-router2"></span></h3> <!-- Router 2 결과 표시 -->
 
     <script>
-        async function postData(url = '/predict', data = {}) {
+        async function postData(url = '', data = {}) {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -57,13 +48,16 @@
             const data = {
                 data: formData.get("data")
             };
-            const responseData = await postData('/predict', data);
-            const resultTable = document.getElementById("result-table").getElementsByTagName('tbody')[0];
-            resultTable.innerHTML = ''; // Clear previous results
-            responseData.result.forEach((result, index) => {
-                const row = `<tr><td>${index + 1}</td><td>${result}</td></tr>`;
-                resultTable.insertAdjacentHTML('beforeend', row);
-            });
+
+            // 병렬로 두 개의 요청 보내기
+            const response1 = postData('/predict_router1', data);
+            const response2 = postData('/predict_router2', data);
+
+            const results = await Promise.all([response1, response2]);
+
+            // 결과 표시
+            document.getElementById("result-router1").textContent = results[0]['result-router1']; // Router 1 결과 설정
+            document.getElementById("result-router2").textContent = results[1]['result-router2']; // Router 2 결과 설정
         });
     </script>
 </body>

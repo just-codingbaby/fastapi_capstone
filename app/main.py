@@ -2,12 +2,12 @@ from fastapi import Request
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from routers.predict_router import router
+from routers.predict_router import router2, router1
 import mysql.connector
 
 app = FastAPI()
-
-app.include_router(router)      # 모델 라우터
+app.include_router(router1)
+app.include_router(router2)      # 모델 라우터
 
 templates = Jinja2Templates(directory="/Users/jeonghaechan/projects/capstone-fastapi/templates")
 
