@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotenv import load_dotenv
 from fastapi import Request
@@ -10,6 +11,8 @@ import mysql.connector
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, '..', '.env'))
+sys.path.append(os.path.join(BASE_DIR, '..'))
+
 
 MODEL_DIR = os.getenv('MODEL_DIR', os.path.join(BASE_DIR, 'model'))
 DATA_DIR = os.getenv('DATA_DIR', os.path.join(BASE_DIR, 'data'))
