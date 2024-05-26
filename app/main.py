@@ -10,8 +10,7 @@ from routers.predict_router import router2, router1
 import mysql.connector
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
-sys.path.append('/home/ubuntu/fastapi_capstone')
+sys.path.append(os.path.abspath(os.path.join(BASE_DIR, '..')))
 load_dotenv(os.path.join(BASE_DIR, '..', '.env'))
 
 
