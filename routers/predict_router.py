@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -8,6 +9,11 @@ import mysql.connector
 import os
 import json
 import time
+
+load_dotenv()
+
+MODEL_DIR = os.getenv('MODEL_DIR')
+DATA_DIR = os.getenv('DATA_DIR')
 
 from app.db_process import connect_to_mysql
 
@@ -66,8 +72,9 @@ async def predict(input_data: PredictionInput):
 
             model_test_scaled = torch.FloatTensor(model_test).unsqueeze(0).to(device)
 
-            model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/중부선모델/' + node["노드명"] + '.pkl'
+            # model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/중부선모델/' + node["노드명"] + '.pkl'
             # 모델 디렉토리 나중에 변동해야함
+            model_name = os.path.join(MODEL_DIR, '중부선모델', node["노드명"] + '.pkl')
 
             example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
             example.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
@@ -114,7 +121,8 @@ async def predict(input_data: PredictionInput):
 
             model_test_scaled = torch.FloatTensor(model_test).unsqueeze(0).to(device)
 
-            model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/경부선모델/' + node["노드명"] + '.pkl'
+            # model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/경부선모델/' + node["노드명"] + '.pkl'
+            model_name = os.path.join(MODEL_DIR, '경부선모델', node["노드명"] + '.pkl')
             # 모델 디렉토리 나중에 변동해야함
 
             example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
@@ -187,7 +195,9 @@ async def predict(input_data: PredictionInput):
 
             model_test_scaled = torch.FloatTensor(model_test).unsqueeze(0).to(device)
 
-            model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/경부선모델/' + node["노드명"] + '.pkl'
+            # model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/경부선모델/' + node["노드명"] + '.pkl'
+            model_name = os.path.join(MODEL_DIR, '경부선모델', node["노드명"] + '.pkl')
+
                 #모델 디렉토리 나중에 변동해야함
 
             example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
