@@ -52,6 +52,7 @@ async def predict(input_data: PredictionInput):
         records_r1_0352 = cursor_r1.fetchall()
 
         print("경로1 중부선 실행 시작")
+        start = time.time()
         for node in records_r1_0352:
             node_name = f"{node['노드명']}_{str(node['위도'])}_{str(node['경도'])}"
             print(node_name)
@@ -147,6 +148,8 @@ async def predict(input_data: PredictionInput):
             list_t.append(t)
 
         print("경로1 경부선 실행 완료")
+        end = time.time()
+        print(f"실행 시: {end-start}")
 
         return {"result-router1": round(sum(list_t),2)}
     except Exception as e:
@@ -176,6 +179,7 @@ async def predict(input_data: PredictionInput):
         records_r0010 = cursor_r0010.fetchall()
 
         print("경로2 실행 시작")
+        start = time.time()
         for node in records_r0010:
             node_name = f"{node['노드명']}_{str(node['위도'])}_{str(node['경도'])}"
             print(node_name)
@@ -218,7 +222,10 @@ async def predict(input_data: PredictionInput):
                 continue
             t = distance / 1000 / pred[0][-1] * 60  # km로 바꾸고, 분으로 변경
             list_t.append(t)
+
+        end=time.time()
         print("경로2 종료")
+        print(f"예측 시간: {end-start}")
 
         return {"result-router2": round(sum(list_t),2)}
     except Exception as e:
