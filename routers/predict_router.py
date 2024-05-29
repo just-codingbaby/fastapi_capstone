@@ -59,7 +59,7 @@ async def predict(input_data: PredictionInput):
 
             df = create_dataframe_from_table(node_name, "중부선")  # 데이터프레임 형성
             # -4로 하는 건 .Csv 제거
-
+            print(df)
             enc_in = len(df.columns)
             seq_len = 48
             pred_len = 1
@@ -108,7 +108,7 @@ async def predict(input_data: PredictionInput):
 
             df = create_dataframe_from_table(node_name, "경부선")  # 데이터프레임 형성
             # -4로 하는 건 .Csv 제거
-
+            print(df)
             enc_in = len(df.columns)
             seq_len = 48
             pred_len = 1
