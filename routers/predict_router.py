@@ -59,7 +59,7 @@ async def predict(input_data: PredictionInput):
 
             df = create_dataframe_from_table(node_name, "중부선")  # 데이터프레임 형성
             # -4로 하는 건 .Csv 제거
-            print("dataframe 형성 완료")
+
             enc_in = len(df.columns)
             seq_len = 48
             pred_len = 1
@@ -69,11 +69,8 @@ async def predict(input_data: PredictionInput):
 
             # input 값에 따라 필터링
             filtered_df = df[(df.index >= start_time) & (df.index < end_time)]
-            print("데이터 필터링 완료")
             model_test = pd.DataFrame(filtered_df).apply(pd.to_numeric, errors='coerce').to_numpy()
-            print("model_test")
             model_test_scaled = torch.FloatTensor(model_test).unsqueeze(0).to(device)
-            print("model_test_scaled")
             # model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/중부선모델/' + node["노드명"] + '.pkl'
             # 모델 디렉토리 나중에 변동해야함
             model_name = os.path.join(MODEL_DIR, '중부선모델', node["노드명"] + '.pkl')
@@ -82,7 +79,7 @@ async def predict(input_data: PredictionInput):
             example.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
 
             example.eval()
-            print("모델 추론 수행")
+
             # 모델 추론 수행
             with torch.no_grad():
                 prediction = example(model_test_scaled)
@@ -109,7 +106,7 @@ async def predict(input_data: PredictionInput):
 
             df = create_dataframe_from_table(node_name, "경부선")  # 데이터프레임 형성
             # -4로 하는 건 .Csv 제거
-            print(df)
+
             enc_in = len(df.columns)
             seq_len = 48
             pred_len = 1
@@ -150,7 +147,9 @@ async def predict(input_data: PredictionInput):
 
         print("경로1 경부선 실행 완료")
         end = time.time()
-        print(f"실행 시: {end-start}")
+        print(f"모델 실행 시간: {end-start}")
+        time_route1 = round(sum(list_t),2)
+        print(f"예측 결과 시간: {time_route1}분")
 
         return {"result-router1": round(sum(list_t),2)}
     except Exception as e:
@@ -226,7 +225,10 @@ async def predict(input_data: PredictionInput):
 
         end=time.time()
         print("경로2 종료")
-        print(f"예측 시간: {end-start}")
+        print(f"모델 실행 시간: {end-start}")
+        time_route2 = round(sum(list_t),2)
+        print(f"예측 결과 시간: {time_route2}분")
+
 
         return {"result-router2": round(sum(list_t),2)}
     except Exception as e:
