@@ -33,6 +33,8 @@ async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
         end_time = pd.to_datetime(end_time)
+        end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
+
         print(end_time)
 
         timedelta = pd.Timedelta(hours=4)
