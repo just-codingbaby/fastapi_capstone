@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from model.inference import use_cuda, create_dataframe_from_table, TSMixer
+from model.inference import use_cuda, create_dataframe_from_table, SegRnn
 import pandas as pd
 import torch
 import mysql.connector
@@ -77,7 +77,7 @@ async def predict(input_data: PredictionInput):
             # 모델 디렉토리 나중에 변동해야함
             model_name = os.path.join(MODEL_DIR, '중부선모델', node["노드명"] + '.pkl')
 
-            example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
+            example = SegRnn(enc_in, seq_len, pred_len, patch_len, dropout, hidden_dim).to(device)
             example.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
 
             example.eval()
@@ -126,7 +126,7 @@ async def predict(input_data: PredictionInput):
             model_name = os.path.join(MODEL_DIR, '경부선모델', node["노드명"] + '.pkl')
             # 모델 디렉토리 나중에 변동해야함
 
-            example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
+            example = SegRnn(enc_in, seq_len, pred_len, patch_len, dropout, hidden_dim).to(device)
             example.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
 
             example.eval()
@@ -163,12 +163,13 @@ async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
         end_time = pd.to_datetime(end_time)
+        end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
+
         print(end_time)
 
         timedelta = pd.Timedelta(hours=4)
         start_time = end_time - timedelta
         print(start_time)
-
 
         result = []     #예측결과 리스트로 받음
         i = 0           #전달받은 경로 사이의 거리 리스트 요소 갯수만큼 for문에서 ++
@@ -203,11 +204,10 @@ async def predict(input_data: PredictionInput):
 
             # model_name = '/Users/jeonghaechan/projects/capstone-fastapi/model/경부선모델/' + node["노드명"] + '.pkl'
             model_name = os.path.join(MODEL_DIR, '경부선모델', node["노드명"] + '.pkl')
+            # 모델 디렉토리 나중에 변동해야함
 
-                #모델 디렉토리 나중에 변동해야함
-
-            example = TSMixer(enc_in, seq_len, pred_len, 32).to(device)
-            example.load_state_dict(torch.load(model_name,map_location=torch.device('cpu')))
+            example = SegRnn(enc_in, seq_len, pred_len, patch_len, dropout, hidden_dim).to(device)
+            example.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
 
             example.eval()
 
