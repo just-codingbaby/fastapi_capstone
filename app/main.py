@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -45,8 +46,11 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+logging.basicConfig(level=logging.INFO)
+
 @app.post("/test")
 async def receive_from_spring(data: str):
+    logging.info(f"Received data: {data}")
     return {"message": f"Received data: {data}"}
 
 if __name__ == "__main__":
