@@ -61,7 +61,7 @@ async def receive_from_spring(data_model: DataModel):
 
 # fastapi에서 spring으로 보내기
 
-@app.post("/send-data")
+@app.post("/from-fastapi")
 async def send_data():
 
     data = {"message": "hello from fastapi"}
