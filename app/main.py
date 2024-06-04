@@ -46,10 +46,15 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+class DataModel(BaseModel):
+    data: str
+
+
 logging.basicConfig(level=logging.INFO)
 
 @app.post("/test")
-async def receive_from_spring(data: str):
+async def receive_from_spring(data_model: DataModel):
+    data = data_model.data
     logging.info(f"Received data: {data}")
     return {"message": f"Received data: {data}"}
 
