@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import sys
@@ -52,11 +53,25 @@ class DataModel(BaseModel):
 
 logging.basicConfig(level=logging.INFO)
 
-@app.post("/test")
+@app.post("/from-spring")
 async def receive_from_spring(data_model: DataModel):
     data = data_model.data
     logging.info(f"Received data: {data}")
     return {"message": f"Received data: {data}"}
+
+# fastapi에서 spring으로 보내기
+
+@app.post("/send-data")
+async def send_data():
+
+    data = {"message": "hello from fastapi"}
+    URL = "http://13.125.185.190:8080/from-fastapi"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(URL, json=data)
+        return {"status_code": response.status_code, "response_text": response.text}
+
+
 
 if __name__ == "__main__":
     import uvicorn
