@@ -1,6 +1,9 @@
 import os
 import sys
 
+import httpx
+from pydantic import BaseModel
+
 # 현재 파일의 디렉토리 경로
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,6 +44,10 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.post("/test")
+async def receive_from_spring(data: str):
+    return {"message": f"Received data: {data}"}
 
 if __name__ == "__main__":
     import uvicorn
