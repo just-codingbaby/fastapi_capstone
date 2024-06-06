@@ -39,7 +39,7 @@ async def predict(input_data: PredictionInput):
         end_time = pd.to_datetime(end_time)
 
         # csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=24)
         print(f"2번 csv_time: {csv_time}")
         csv_file_path = os.path.join(CSV_DIR, '2번실시간.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
@@ -192,7 +192,7 @@ async def predict(input_data: PredictionInput):
         end_time = pd.to_datetime(end_time)
 
         # csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) - pd.DateOffset(days=4)
+        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=3)
         print(f"4번 csv_time: {csv_time}")
         csv_file_path = os.path.join(CSV_DIR, '4번실시간.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
@@ -268,7 +268,7 @@ async def predict(input_data: PredictionInput):
         time_route2 = int(round(sum(list_t),2))
         print(f"예측 결과 시간: {time_route2}분")
 
-        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2) + datetime.timedelta(days=14)
+        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2) + datetime.timedelta(days=21)
         print(f"6번 csv_time: {csv_time_route2}")
         csv_file_path = os.path.join(CSV_DIR, '6번실시간.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
