@@ -28,10 +28,13 @@ load_dotenv(env_path)
 MODEL_DIR = os.getenv('MODEL_DIR')
 DATA_DIR = os.getenv('DATA_DIR')
 TEMPLATES_DIR = os.getenv('TEMPLATES_DIR', os.path.join(PROJECT_ROOT, 'templates'))
+CSV_DIR = os.getenv('CSV_DIR')
 print(f"PROJECT ROOT:{PROJECT_ROOT}")
 print(f"Model directory: {MODEL_DIR}")
 print(f"Data directory: {DATA_DIR}")
+print(f"Csv directory: {CSV_DIR}")
 print(f"Templates directory: {TEMPLATES_DIR}")
+
 
 app = FastAPI()
 

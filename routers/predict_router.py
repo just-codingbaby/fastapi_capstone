@@ -1,3 +1,5 @@
+import datetime
+
 import httpx
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
@@ -15,6 +17,7 @@ load_dotenv()
 
 MODEL_DIR = os.getenv('MODEL_DIR')
 DATA_DIR = os.getenv('DATA_DIR')
+CSV_DIR = os.getenv('CSV_DIR')
 
 from app.db_process import connect_to_mysql
 
@@ -28,12 +31,23 @@ class PredictionInput(BaseModel):       # 입력 데이터(YYYY-MM-DD-HH-MM-SS)
 
 # 파일이름:노드명_위도_경도
 
-# 중부-경부 경로1
+# 중부-경부 경로1: RouteA
 @router1.post("/predict_router1")
 async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
         end_time = pd.to_datetime(end_time)
+
+        # csv에 들어갈 시간
+        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        print(f"2번 csv_time: {csv_time}")
+        csv_file_path = os.path.join(CSV_DIR, '2번실시간.csv')
+        df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
+        matched_row = df[df['time'] == csv_time]
+        duration = int(matched_row['duration'].values[0])
+        print(f"2번 duration: {duration}")
+
+        #모델에 들어갈 시간
         end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
 
         print(end_time)
@@ -151,9 +165,18 @@ async def predict(input_data: PredictionInput):
         print("경로1 경부선 실행 완료")
         end = time.time()
         print(f"모델 실행 시간: {end-start}")
-        time_route1 = round(sum(list_t),2)
+        time_route1 = int(round(sum(list_t),2))
         print(f"예측 결과 시간: {time_route1}분")
 
+        csv_time_route1 = csv_time + datetime.timedelta(minutes=time_route1)
+        print(f"6번 csv_time: {csv_time_route1}")
+        csv_file_path = os.path.join(CSV_DIR, '6번실시간.csv')
+        df = pd.read_csv(csv_file_path, parse_dates=['time'],encoding='EUC-KR')
+        matched_row = df[df['time'] == csv_time_route1]
+        duration2 = int(matched_row['duration'].values[0])
+        print(f"6번 duration: {duration2}")
+
+        time_route1 = time_route1 + duration + duration2
 
         return {"RouteA Time": time_route1}
 
@@ -161,11 +184,22 @@ async def predict(input_data: PredictionInput):
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
 
+#경부선 경로2, 실시간추천 RouterC
 @router2.post("/predict_router2")
 async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
         end_time = pd.to_datetime(end_time)
+
+        # csv에 들어갈 시간
+        csv_time = end_time - pd.DateOffset(months=1) - pd.DateOffset(days=4)
+        print(f"4번 csv_time: {csv_time}")
+        csv_file_path = os.path.join(CSV_DIR, '4번실시간.csv')
+        df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
+        matched_row = df[df['time'] == csv_time]
+        duration = int(matched_row['duration'].values[0])
+        print(f"4번 duration: {duration}")
+
         end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
 
         print(end_time)
@@ -231,11 +265,21 @@ async def predict(input_data: PredictionInput):
         end=time.time()
         print("경로2 종료")
         print(f"모델 실행 시간: {end-start}")
-        time_route2 = round(sum(list_t),2)
+        time_route2 = int(round(sum(list_t),2))
         print(f"예측 결과 시간: {time_route2}분")
 
+        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2) + datetime.timedelta(days=14)
+        print(f"6번 csv_time: {csv_time_route2}")
+        csv_file_path = os.path.join(CSV_DIR, '6번실시간.csv')
+        df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
+        matched_row = df[df['time'] == csv_time_route2]
+        duration2 = int(matched_row['duration'].values[0])
+        print(f"6번 duration: {duration2}")
 
-        return {"RouteB time": time_route2}
+        time_route2 = time_route2 + duration + duration2
+
+
+        return {"RouteC time": time_route2}
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
