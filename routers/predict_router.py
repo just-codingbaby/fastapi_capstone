@@ -1,3 +1,4 @@
+import httpx
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -153,7 +154,15 @@ async def predict(input_data: PredictionInput):
         time_route1 = round(sum(list_t),2)
         print(f"예측 결과 시간: {time_route1}분")
 
-        return {"result-router1": round(sum(list_t),2)}
+
+        URL = "http://13.125.185.190:8080/api/departureTime"
+        async with httpx.AsyncClient() as client:
+            response = await client.post(URL, json={"routeA prediction time":time_route1})
+            response.raise_for_status()
+
+
+        return {"result-router1": time_route1}
+
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
@@ -231,8 +240,14 @@ async def predict(input_data: PredictionInput):
         time_route2 = round(sum(list_t),2)
         print(f"예측 결과 시간: {time_route2}분")
 
+        URL = "http://13.125.185.190:8080/api/departureTime"
 
-        return {"result-router2": round(sum(list_t),2)}
+        async with httpx.AsyncClient() as client:
+            response = await client.post(URL, json={"routeB prediction time": time_route2})
+            response.raise_for_status()
+
+
+        return {"result-router2": time_route2}
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
