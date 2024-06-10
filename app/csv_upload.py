@@ -8,7 +8,7 @@ config = {
     'user': 'root',
     'password': 'Wjdgocks2!',
     'host': 'localhost',
-    'database': '중부선',
+    'database': '경부선_VDE',
     'raise_on_warnings': True
 }
 
@@ -27,7 +27,7 @@ except mysql.connector.Error as err:
     exit()
 
 # 특정 디렉토리 경로 설정
-directory_path = '/Users/jeonghaechan/projects/capstone-fastapi/data/중부선_gps'
+directory_path = '/Users/jeonghaechan/projects/capstone-fastapi/data/경부선_VDE'
 files = sorted([file for file in os.listdir(directory_path) if not file.startswith('.DS_Store')])
 
 # 디렉토리 내 모든 CSV 파일 목록 가져오기

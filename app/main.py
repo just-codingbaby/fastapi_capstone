@@ -39,10 +39,12 @@ print(f"Templates directory: {TEMPLATES_DIR}")
 app = FastAPI()
 
 # 라우터 경로 설정
-from routers.predict_router import router2, router1
+from routers.predict_router import router2, router1, router4, router5
 
 app.include_router(router1)
 app.include_router(router2)  # 모델 라우터
+app.include_router(router4)
+app.include_router(router5)
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
