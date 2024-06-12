@@ -290,6 +290,8 @@ async def predict(input_data: PredictionInput):
         raise HTTPException(status_code=500, detail=str(e)) 
 
 #경부선 경로2 최단경로 RouterB
+
+#경부선 경로2, 최단경로 RouterB
 @router2.post("/predict_router2")
 async def predict(input_data: PredictionInput):
     try:
@@ -297,13 +299,13 @@ async def predict(input_data: PredictionInput):
         end_time = pd.to_datetime(end_time)
 
         # csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        csv_time = end_time - pd.DateOffset(days=7)
         print(f"3번 csv_time: {csv_time}")
         csv_file_path = os.path.join(CSV_DIR, '3번최단거리.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time]
         duration = int(matched_row['duration'].values[0])
-        print(f"4번 duration: {duration}")
+        print(f"3번 duration: {duration}")
 
         end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
 
@@ -373,13 +375,13 @@ async def predict(input_data: PredictionInput):
         time_route2 = int(round(sum(list_t),2))
         print(f"예측 결과 시간: {time_route2}분")
 
-        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2)
+        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2) - pd.DateOffset(months=1) + pd.DateOffset(days=14)
         print(f"5번 csv_time: {csv_time_route2}")
         csv_file_path = os.path.join(CSV_DIR, '5번최단거리.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time_route2]
         duration2 = int(matched_row['duration'].values[0])
-        print(f"6번 duration: {duration2}")
+        print(f"5번 duration: {duration2}")
 
         time_route2 = time_route2 + duration + duration2
 
@@ -401,13 +403,13 @@ async def predict(input_data: ReturnInput):
         end_time = pd.to_datetime(end_time)
 
         #csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        csv_time = end_time  - pd.DateOffset(days=7)
         print(f"6번 csv_time: {csv_time}")
-        csv_file_path = os.path.join(CSV_DIR, '6번실시간.csv')
+        csv_file_path = os.path.join(CSV_DIR, '6번실시간VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time]
         duration = int(matched_row['duration'].values[0])
-        print(f"2번 duration: {duration}")
+        print(f"6번 duration: {duration}")
 
         #모델에 들어갈 시간
         end_time = end_time - pd.DateOffset(years=1) + pd.DateOffset(days=2)
@@ -532,7 +534,7 @@ async def predict(input_data: ReturnInput):
 
         csv_time_route1 = csv_time + datetime.timedelta(minutes=time_reverse1)
         print(f"2번 csv_time: {csv_time_route1}")
-        csv_file_path = os.path.join(CSV_DIR, '2번실시간.csv')
+        csv_file_path = os.path.join(CSV_DIR, '2번실시간VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'],encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time_route1]
         duration2 = int(matched_row['duration'].values[0])
@@ -554,9 +556,9 @@ async def predict(input_data: ReturnInput):
         end_time = pd.to_datetime(end_time)
 
         #csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        csv_time = end_time  - pd.DateOffset(days=7)
         print(f"6번 csv_time: {csv_time}")
-        csv_file_path = os.path.join(CSV_DIR, '6번실시간.csv')
+        csv_file_path = os.path.join(CSV_DIR, '6번실시간VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time]
         duration = int(matched_row['duration'].values[0])
@@ -630,9 +632,9 @@ async def predict(input_data: ReturnInput):
         time_reverse2 = int(round(sum(list_t),2))
         print(f"예측 결과 시간: {time_reverse2}분")
 
-        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_reverse2) - datetime.timedelta(days=14)
+        csv_time_route2 = csv_time + datetime.timedelta(minutes=time_reverse2)
         print(f"4번 csv_time: {csv_time_route2}")
-        csv_file_path = os.path.join(CSV_DIR, '4번실시간.csv')
+        csv_file_path = os.path.join(CSV_DIR, '4번실시간VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time_route2]
         duration2 = int(matched_row['duration'].values[0])
@@ -654,9 +656,9 @@ async def predict(input_data: PredictionInput):
         end_time = pd.to_datetime(end_time)
 
         # csv에 들어갈 시간
-        csv_time = end_time - pd.DateOffset(months=1) + pd.DateOffset(days=10)
+        csv_time = end_time - pd.DateOffset(days=7)
         print(f"5번 csv_time: {csv_time}")
-        csv_file_path = os.path.join(CSV_DIR, '5번최단거리.csv')
+        csv_file_path = os.path.join(CSV_DIR, '5번최단거리VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time]
         duration = int(matched_row['duration'].values[0])
@@ -732,7 +734,7 @@ async def predict(input_data: PredictionInput):
 
         csv_time_route2 = csv_time + datetime.timedelta(minutes=time_route2)
         print(f"3번 csv_time: {csv_time_route2}")
-        csv_file_path = os.path.join(CSV_DIR, '3번최단거리.csv')
+        csv_file_path = os.path.join(CSV_DIR, '3번최단거리VDE.csv')
         df = pd.read_csv(csv_file_path, parse_dates=['time'], encoding='EUC-KR')
         matched_row = df[df['time'] == csv_time_route2]
         duration2 = int(matched_row['duration'].values[0])
@@ -740,7 +742,7 @@ async def predict(input_data: PredictionInput):
 
         time_route2 = time_route2 + duration + duration2
 
-
+     
         return {"ReverseB time": time_route2}
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
