@@ -190,7 +190,7 @@ async def predict(input_data: PredictionInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 #경부선 경로3, 실시간추천 RouterC
-@router2.post("/predict_router3")
+@router3.post("/predict_router3")
 async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
@@ -290,7 +290,7 @@ async def predict(input_data: PredictionInput):
         raise HTTPException(status_code=500, detail=str(e)) 
 
 #경부선 경로2 최단경로 RouterB
-@router3.post("/predict_router2")
+@router2.post("/predict_router2")
 async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
@@ -547,7 +547,7 @@ async def predict(input_data: ReturnInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 #경부선 실시간추천 경로3 / 성심당->세종대
-@router5.post("/reverse_router3")
+@router6.post("/reverse_router3")
 async def predict(input_data: ReturnInput):
     try:
         end_time = input_data.data
@@ -647,7 +647,7 @@ async def predict(input_data: ReturnInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 #경로2 경부선 최단경로 성심당->세종대
-@router6.post("/reverse_router2")
+@router5.post("/reverse_router2")
 async def predict(input_data: PredictionInput):
     try:
         end_time = input_data.data
