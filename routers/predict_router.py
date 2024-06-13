@@ -650,7 +650,7 @@ async def predict(input_data: ReturnInput):
 
 #경로2 경부선 최단경로 성심당->세종대
 @router5.post("/reverse_router2")
-async def predict(input_data: PredictionInput):
+async def predict(input_data: ReturnInput):
     try:
         end_time = input_data.data
         end_time = pd.to_datetime(end_time)
