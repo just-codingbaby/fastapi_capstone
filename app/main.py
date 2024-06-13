@@ -42,6 +42,8 @@ app = FastAPI()
 # 라우터 경로 설정
 from routers.predict_router import router1, router2
 
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 class PredictionInput(BaseModel):       # 입력 데이터(YYYY-MM-DD-HH-MM-SS)
     data: str
@@ -49,11 +51,13 @@ class PredictionInput(BaseModel):       # 입력 데이터(YYYY-MM-DD-HH-MM-SS)
 
 @app.post("/predict")
 async def predict(input_data: PredictionInput):
+    logger.debug(f"Received input data: {input_data}")
     try:
         results = await asyncio.gather(
             router1(input_data),
             router2(input_data)
         )
+        logger.debug(f"Response: {results}")
 
         return {
             "RouteA Time": results[0],
