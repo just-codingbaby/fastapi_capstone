@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import sys
+from fastapi import HTTPException
 
 import httpx
 from pydantic import BaseModel
@@ -39,46 +40,29 @@ print(f"Templates directory: {TEMPLATES_DIR}")
 app = FastAPI()
 
 # 라우터 경로 설정
-from routers.predict_router import router2, router1, router4, router5, router3, router6
-
-app.include_router(router1)
-app.include_router(router2)  # 모델 라우터
-app.include_router(router3)
-app.include_router(router4)
-app.include_router(router5)
-app.include_router(router6)
+from routers.predict_router import router1, router2
 
 
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
-
-@app.get("/", response_class=HTMLResponse)
-async def read_item(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-class DataModel(BaseModel):
+class PredictionInput(BaseModel):       # 입력 데이터(YYYY-MM-DD-HH-MM-SS)
     data: str
+    start: str
 
+@app.post("/predict")
+async def predict(input_data: PredictionInput):
+    try:
+        results = await asyncio.gather(
+            router1(input_data),
+            router2(input_data)
+        )
 
-logging.basicConfig(level=logging.INFO)
+        return {
+            "RouteA Time": results[0],
+            "RouteB Time": results[1][0],
+            "RouteC Time": results[1][1]
+        }
 
-@app.post("/from-spring")
-async def receive_from_spring(data_model: DataModel):
-    data = data_model.data
-    logging.info(f"Received data: {data}")
-    return {"message": f"Received data: {data}"}
-
-# fastapi에서 spring으로 보내기
-
-@app.post("/from-fastapi")
-async def send_data():
-
-    data = {"message": "hello from fastapi"}
-    URL = "http://13.125.185.190:8080/from-fastapi"
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(URL, json=data)
-        return {"status_code": response.status_code, "response_text": response.text}
-
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
