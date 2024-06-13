@@ -515,7 +515,7 @@ async def predict(input_data: PredictionInput):
 
             time_route2 = time_route2 + duration + duration2
 
-        return {"RouteB time": time_route2}
+        return {"RouteB Time": time_route2}
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
@@ -702,7 +702,7 @@ async def predict(input_data: PredictionInput):
 
             time_route2 = time_route2 + duration + duration2
 
-        return {"RouteC time": time_route2}
+        return {"RouteC Time": time_route2}
     except Exception as e:
         # 예외 발생 시 HTTP 예외 반환
         raise HTTPException(status_code=500, detail=str(e))
