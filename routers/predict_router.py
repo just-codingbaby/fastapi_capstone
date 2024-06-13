@@ -396,7 +396,7 @@ class ReturnInput(BaseModel):
     data:str
 
 #중부+경부 성심당->세종대
-@router4.post("/reverse_router1")
+@router4.post("/predict_router4")
 async def predict(input_data: ReturnInput):
     try:
         end_time = input_data.data
@@ -549,7 +549,7 @@ async def predict(input_data: ReturnInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 #경부선 실시간추천 경로3 / 성심당->세종대
-@router6.post("/reverse_router3")
+@router6.post("/predict_router6")
 async def predict(input_data: ReturnInput):
     try:
         end_time = input_data.data
@@ -649,7 +649,7 @@ async def predict(input_data: ReturnInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 #경로2 경부선 최단경로 성심당->세종대
-@router5.post("/reverse_router2")
+@router5.post("/predict_router5")
 async def predict(input_data: ReturnInput):
     try:
         end_time = input_data.data
